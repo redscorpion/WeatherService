@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sws="http://www.springframework.org/schema/web-services"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/web-services
+						http://www.springframework.org/schema/web-services/web-services.xsd
+						http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+ 						http://www.springframework.org/schema/context
+ 						http://www.springframework.org/schema/context/spring-context.xsd
+ 						http://www.springframework.org/schema/aop 
+						http://www.springframework.org/schema/aop/spring-aop.xsd ">
+
+	<!-- Set-up location mapper -->
+
+	<bean id="weatherEndpointResponseLocationMappingFile"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<value>classpath:weather_endpoint_response_location_mapping
+				</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="weatherEndpointRequestLocationMappingFile"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<value>classpath:weather_endpoint_request_location_mapping
+				</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="soap_weather_endpoint_config_responseLocationMapping"
+		class="java.util.Properties">
+		<constructor-arg ref="weatherEndpointResponseLocationMappingFile" />
+	</bean>
+
+	<bean id="soap_weather_endpoint_config_requestLocationMapping"
+		class="java.util.Properties">
+		<constructor-arg ref="weatherEndpointRequestLocationMappingFile" />
+	</bean>
+
+	<bean id="soap_weather_locationMapper"
+		class="com.tieto.services.weather.response.mapper.impl.PropertiesBasedLocationMapper">
+		<constructor-arg name="requestMapping"
+			ref="soap_weather_endpoint_config_requestLocationMapping" />
+		<constructor-arg name="responseMapping"
+			ref="soap_weather_endpoint_config_responseLocationMapping" />
+	</bean>
+
+	<!-- Set-up AspectJ autoproxy -->
+
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+
+	<!-- Scan for the weather service SOAP endpoint -->
+	<context:component-scan base-package="com.tieto.services.weather.endpoint.soap" />
+
+	<sws:annotation-driven />
+
+	<!-- Enable SOAP request/response validation -->
+	<sws:interceptors>
+		<bean id="validatingInterceptor"
+			class="org.springframework.ws.soap.server.endpoint.interceptor.PayloadValidatingInterceptor">
+			<property name="schema" value="classpath:/weather.xsd" />
+			<property name="validateRequest" value="true" />
+			<property name="validateResponse" value="true" />
+		</bean>
+	</sws:interceptors>
+
+	<!-- Generate WSDL -->
+	<sws:dynamic-wsdl id="weather" portTypeName="Weather"
+		locationUri="/soap/" targetNamespace="http://services.tieto.com/weather/beans"
+		requestSuffix="Request" responseSuffix="Response">
+		<sws:xsd location="classpath:/weather.xsd" />
+	</sws:dynamic-wsdl>
+
+</beans>

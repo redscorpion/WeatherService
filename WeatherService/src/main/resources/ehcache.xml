@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<diskStore path="java.io.tmpdir" />
+	<cache name="weatherCache" maxEntriesLocalHeap="1000" eternal="false"
+		timeToIdleSeconds="3600" timeToLiveSeconds="3600" maxEntriesLocalDisk="100000"
+		diskExpiryThreadIntervalSeconds="3600" memoryStoreEvictionPolicy="LRU" />
+
+</ehcache>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/cache
+						http://www.springframework.org/schema/cache/spring-cache.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/task
+ 						http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<!-- Set-up weather model -->
+
+	<context:component-scan base-package="com.tieto.services.weather.model" />
+
+	<!-- Set-up Weather Underground weather adapter -->
+
+	<bean id="wuRequestLocationMappingFile"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<value>classpath:wu_request_location_mapping</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="wuResponseLocationMappingFile"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<value>classpath:wu_response_location_mapping</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="wu_config_requestLocationMapping" class="java.util.Properties">
+		<beans:constructor-arg ref="wuRequestLocationMappingFile" />
+	</bean>
+
+	<bean id="wu_config_responseLocationMapping" class="java.util.Properties">
+		<beans:constructor-arg ref="wuResponseLocationMappingFile" />
+	</bean>
+
+	<bean id="wu_config_apiKey" class="java.lang.String">
+		<beans:constructor-arg value="b1b4d31c3d3d4285" />
+	</bean>
+
+	<context:component-scan base-package="com.tieto.services.weather.wu" />
+
+	<!-- Set-up the WeatherService and weather cache -->
+
+	<context:component-scan base-package="com.tieto.services.weather.service" />
+
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager"
+		p:cache-manager-ref="ehcache" />
+
+	<bean id="ehcache"
+		class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"
+		p:config-location="classpath:/ehcache.xml" p:shared="true" />
+
+	<cache:annotation-driven />
+
+	<!-- Set-up javax.validation framework -->
+
+	<bean id="validator"
+		class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+
+	<!-- Set-up automatic weather refresh task -->
+
+	<context:property-placeholder location="classpath:/weather-update.properties" />
+
+	<task:annotation-driven />
+
+</beans>

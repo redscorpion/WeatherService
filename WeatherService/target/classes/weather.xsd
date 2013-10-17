@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="qualified"
+	elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns="http://services.tieto.com/weather/response/beans"
+	targetNamespace="http://services.tieto.com/weather/response/beans">
+
+	<xs:element name="getWeatherRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="location" type="xs:string" minOccurs="0"
+					maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="getWeatherResponse">
+		<xs:complexType>
+			<xs:choice>
+				<xs:element name="response" type="tns:weatherDTO"
+					minOccurs="0" maxOccurs="unbounded" />
+				<xs:element name="error" type="tns:errorDTO" minOccurs="0"
+					maxOccurs="1" />
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="weatherDTO">
+		<xs:all minOccurs="1">
+			<xs:element name="location" type="xs:string" />
+			<xs:element name="temp_c" type="xs:decimal" />
+			<xs:element name="weather" type="xs:string" />
+			<xs:element name="relative_humidity" type="xs:string" />
+			<xs:element name="wind_dir" type="xs:string" />
+			<xs:element name="wind_string" type="xs:string" />
+			<xs:element name="observation_time" type="xs:dateTime" />
+		</xs:all>
+	</xs:complexType>
+
+	<xs:complexType name="errorDTO">
+		<xs:all>
+			<xs:element name="code" type="xs:string" minOccurs="1" />
+			<xs:element name="message" type="xs:string" minOccurs="1" />
+			<xs:element name="detail" type="xs:string" minOccurs="0" />
+		</xs:all>
+	</xs:complexType>
+
+</xs:schema>
